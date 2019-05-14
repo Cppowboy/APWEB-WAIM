@@ -8,14 +8,14 @@ import torch.nn as nn
 from sklearn.metrics import accuracy_score, classification_report, precision_recall_fscore_support
 from sklearn.utils import shuffle
 
-# from transformer.analysis import rocstories as rocstories_analysis
-from transformer.datasets import semeval
-from transformer.model_pytorch_cnn import DoubleHeadModel, load_openai_pretrained_model
-from transformer.opt import OpenAIAdam
-from transformer.text_utils import TextEncoder
-from transformer.utils import (encode_dataset, iter_data,
+# from analysis import rocstories as rocstories_analysis
+from datasets import semeval
+from model_pytorch_cnn import DoubleHeadModel, load_openai_pretrained_model
+from opt import OpenAIAdam
+from text_utils import TextEncoder
+from utils import (encode_dataset, iter_data,
                                ResultLogger, make_path)
-from transformer.loss import MultipleChoiceLossCompute,ClassificationLossCompute
+from loss import MultipleChoiceLossCompute,ClassificationLossCompute
 
 
 def transform_roc(X1, X2, X3):
@@ -157,8 +157,8 @@ if __name__ == '__main__':
     parser.add_argument('--log_dir', type=str, default='log/')
     parser.add_argument('--save_dir', type=str, default='save/')
     # parser.add_argument('--data_dir', type=str, default='data/restaurant')
-    # parser.add_argument('--data_dir', type=str, default='data/laptop')
-    parser.add_argument('--data_dir', type=str, default='data/twitter')
+    parser.add_argument('--data_dir', type=str, default='data/laptop')
+    # parser.add_argument('--data_dir', type=str, default='data/twitter')
     parser.add_argument('--submission_dir', type=str, default='submission/')
     parser.add_argument('--analysis', action='store_true')
     parser.add_argument('--seed', type=int, default=42)
@@ -180,8 +180,8 @@ if __name__ == '__main__':
     parser.add_argument('--opt', type=str, default='adam')
     parser.add_argument('--afn', type=str, default='gelu')
     parser.add_argument('--lr_schedule', type=str, default='warmup_linear')
-    parser.add_argument('--encoder_path', type=str, default='transformer/model/encoder_bpe_40000.json')
-    parser.add_argument('--bpe_path', type=str, default='transformer/model/vocab_40000.bpe')
+    parser.add_argument('--encoder_path', type=str, default='model/encoder_bpe_40000.json')
+    parser.add_argument('--bpe_path', type=str, default='model/vocab_40000.bpe')
     parser.add_argument('--n_transfer', type=int, default=12)
     parser.add_argument('--lm_coef', type=float, default=0.5)
     parser.add_argument('--b1', type=float, default=0.9)
@@ -256,7 +256,7 @@ if __name__ == '__main__':
                                                  criterion,
                                                  args.lm_coef,
                                                  model_opt)
-    load_openai_pretrained_model(dh_model.transformer, n_ctx=n_ctx, n_special=n_special, path='transformer/model/')
+    load_openai_pretrained_model(dh_model.transformer, n_ctx=n_ctx, n_special=n_special, path='model/')
 
     dh_model.to(device)
     dh_model = nn.DataParallel(dh_model)

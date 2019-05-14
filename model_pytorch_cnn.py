@@ -216,6 +216,14 @@ class MultipleChoiceHead(nn.Module):
 
         return clf_logits.view(-1, x.size(1))
 
+class DepthWiseConv1d(nn.Module):
+    def __init__(self, in_channel, out_channel, kernel_size):
+        super(DepthWiseConv1d, self).__init__()
+        self.conv1 = nn.Conv1d(in_channel, in_channel, kernel_size, groups=in_channel)
+        self.conv2 = nn.Conv1d(in_channel, out_channel, 1)
+
+    def forward(self, x):
+        return self.conv2(self.conv1(x))
 
 class ClfHead(nn.Module):
     """Classification Head for the transformer
@@ -232,10 +240,11 @@ class ClfHead(nn.Module):
         self.linear = nn.Linear(channel*len(kernel_sizes), n_class)
         nn.init.normal_(self.linear.weight, std=0.02)
         nn.init.normal_(self.linear.bias, std=0.02)
-        self.conv_list = nn.ModuleList([nn.Conv1d(self.n_embd, channel, k) for k in kernel_sizes])
-        for conv in self.conv_list:
-            nn.init.normal_(conv.weight, std=0.02)
-            nn.init.normal_(conv.bias, std=0.02)
+        # self.conv_list = nn.ModuleList([nn.Conv1d(self.n_embd, channel, k) for k in kernel_sizes])
+        self.conv_list = nn.ModuleList([DepthWiseConv1d(self.n_embd, channel, k) for k in kernel_sizes])
+        # for conv in self.conv_list:
+        #    nn.init.normal_(conv.weight, std=0.02)
+        #    nn.init.normal_(conv.bias, std=0.02)
 
     def forward(self, h, x):
         # clf_h = h.view(-1, self.n_embd)
